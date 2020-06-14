@@ -1,10 +1,10 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM % 1129 + 1)) bwv.txt)"
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
-links=($(echo "$url" | xargs -d "\n" -n1 curl -s | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5))
+links=($(lynx --dump $url | awk '/watch\?.{13}$/ {print $2}' | head -n 5))
 
 echo "Today's Bach is: $search
 "
