@@ -4,7 +4,7 @@ search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM %
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
-links=($(echo "$url" | xargs -d "\n" -n1 curl -s | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5))
+links=($( curl -s "$url" | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5))
 
 echo "Today's Bach is: $search
 "
