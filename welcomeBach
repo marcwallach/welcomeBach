@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM % 1129 + 1)) bwv.txt)"
+
+url="https://www.youtube.com/results?search_query=${search// /+}"
+
+links=($(echo "$url" | xargs -d "\n" -n1 curl -s | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5))
+
+echo "Today's Bach is: $search
+"
+PS3="
+Choose a link for a performance: "
+COLUMNS=1
+select link in "${links[@]}"; do
+  break
+done
+
+$BROWSER "https://www.youtube.com$link"
