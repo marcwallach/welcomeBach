@@ -8,7 +8,9 @@ Three versions are currently under development: one that uses [curl](https://cur
 
 1. Clone the repository:
 
-`git clone https://github.com/marcwallach/welcomeBach.git`
+```bash
+git clone https://github.com/marcwallach/welcomeBach.git
+```
 
 2. Check if the welcomeBach script is executable, if not, run:
 
