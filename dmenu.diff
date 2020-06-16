@@ -1,0 +1,21 @@
+--- welcomeBach	2020-06-14 16:20:57.872066106 -0300
++++ welcomeBach-dmenu	2020-06-15 23:00:03.388432758 -0300
+@@ -4,15 +4,8 @@
+ 
+ url="https://www.youtube.com/results?search_query=${search// /+}"
+ 
+-links=($( curl -s "$url" | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5))
++links=$( curl -s "$url" | awk -F "\"" '/watch\?/ && length($14) == 20 {print $14}' | head -n 5 )
+ 
+-echo "Today's Bach is: $search
+-"
+-PS3="
+-Choose a link for a performance: "
+-COLUMNS=1
+-select link in "${links[@]}"; do
+-  break
+-done
++[ "$(printf "No\\nYes" | dmenu -i -p "Wanna listen to some Bach right now?")" = "Yes" ] &&
+ 
+-$BROWSER "https://www.youtube.com$link"
++	echo -e ${links//[[:space:]]/'\n'} | dmenu -l 5 -p "Today's Bach is $search" | sed 's/^/https:\/\/ww.youtube.com/' | xargs -r $BROWSER
