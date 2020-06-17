@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM % 1129 + 1)) bwv.txt)"
 

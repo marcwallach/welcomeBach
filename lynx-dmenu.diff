@@ -1,10 +1,6 @@
---- welcomeBach	2020-06-16 14:34:06.992551826 -0300
-+++ welcomeBach-lynx-dmenu	2020-06-16 21:40:54.815654545 -0300
-@@ -1,17 +1,10 @@
--#!/usr/bin/bash
-+#!/bin/bash
- 
- search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM % 1129 + 1)) bwv.txt)"
+--- welcomeBach	2020-06-16 22:23:11.541727761 -0300
++++ welcomeBach-lynx-dmenu	2020-06-16 21:40:54.000000000 -0300
+@@ -4,14 +4,7 @@
  
  url="https://www.youtube.com/results?search_query=${search// /+}"
  
