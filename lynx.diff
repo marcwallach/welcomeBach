@@ -1,0 +1,11 @@
+--- welcomeBach	2020-06-16 22:23:11.541727761 -0300
++++ welcomeBach-lynx	2020-06-16 22:28:13.558886248 -0300
+@@ -4,7 +4,7 @@
+ 
+ url="https://www.youtube.com/results?search_query=${search// /+}"
+ 
+-links=($( curl -s "$url" | awk -F "\"" '$14 ~ /watch\?/ && length($14) == 20 {print $14}' | head -n 5))
++links=($(lynx --dump $url | awk '/watch\?.{13}$/ {print $2}' | head -n 5))
+ 
+ echo "Today's Bach is: $search
+ "
