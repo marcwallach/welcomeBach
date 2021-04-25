@@ -1,17 +1,74 @@
 #!/bin/bash
 
-search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; grep $(($RANDOM % 1129 + 1)) bwv.txt)"
+# shellcheck disable=SC1004
+
+player="mpv"
+
+! hash "$player" 2>/dev/null && player="xdg-open"
+
+search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; \
+	grep $((RANDOM % 1129 + 1)) bwv.txt)"
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
-links=($( curl -s "$url" | awk -F "\"" '$14 ~ /watch\?/ && length($14) == 20 {print $14}' | head -n 5))
+mapfile -t links < <(curl -s "$url" \
+	| awk -F"\"" '{for (i=1;i<=NF;i++) \
+			{if ($i ~ /watch\?/ && $i !~ /list/) \
+				{print $i ; count++ ; if (count==5) exit} \
+			} \
+		      }')
 
-echo "Today's Bach is: $search
-"
-PS3="
-Choose a link for a performance: "
-COLUMNS=1
-select link in "${links[@]}"; do
-	$BROWSER "https://www.youtube.com$link"
-  break
+message() {
+  cat << EOF
+SYNOPSIS
+ 	 welcomeBach [OPTIONS] [ARGUMENTS]
+
+DESCRIPTION
+  welcomeBach provides a list of links to performances on Youtube of a Bach piece chosen at random
+
+OPTIONS
+  -h	Print help and exit.
+  -p	Set video-player command.
+  -c 	Use a CLI prompt to select link. (Default)
+  -d 	Use dmenu to select link.
+  -f 	Use fzf to select link.
+EOF
+}
+
+cl_prompt() {
+	printf '%s\n' "Today's Bach is:" "$search" ""
+
+	PS3=$'\n'"Choose a link to a performance: "
+
+	COLUMNS=1
+
+	select link in "${links[@]}"; do
+		"$player" "https://www.youtube.com$link"
+	  break
+	done
+	}
+
+dmenu_prompt() {
+	dmenu -l 5 -p "Today's Bach is $search" <<< "$(printf '%s\n' "${links[@]}")" \
+		| sed 's|^|https://www.youtube.com|' \
+		| xargs -r "$player"
+	}
+
+fzf_prompt() {
+	fzf --prompt="Today's Bach is $search > " <<< "$(printf '%s\n' "${links[@]}")" \
+		| sed 's|^|https://www.youtube.com|' \
+		| xargs -r "$player"
+	}
+
+[ $# -eq 0 ] && cl_prompt
+
+while getopts "cdfhp:" opt ; do
+	case $opt in
+		p) player="$OPTARG" ; cl_prompt ;;
+		c) cl_prompt ;;
+		d) dmenu_prompt ;;
+		f) fzf_prompt ;;
+		h) message ; exit ;;
+		*) message ; exit 1 ;;
+	esac
 done
