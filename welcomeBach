@@ -64,10 +64,10 @@ fzf_prompt() {
 
 while getopts "cdfhp:" opt ; do
 	case $opt in
-		p) player="$OPTARG" ; cl_prompt ;;
-		c) cl_prompt ;;
-		d) dmenu_prompt ;;
-		f) fzf_prompt ;;
+		p) player="$OPTARG" ; ${prompt:-cl_prompt} ;;
+		c) prompt=cl_prompt ;;
+		d) prompt=dmenu_prompt ;;
+		f) prompt=fzf_prompt ;;
 		h) message ; exit ;;
 		*) message ; exit 1 ;;
 	esac
