@@ -6,8 +6,9 @@ player="mpv"
 
 ! hash "$player" 2>/dev/null && player="xdg-open"
 
-search="$(RANDOM=$((( -1 * (20200101 - $(date '+%Y%m%d'))))) ; \
-	grep $((RANDOM % 1129 + 1)) bwv.txt)"
+search="$(awk -c -v today="$(date "+%Y%m%d")" \
+	'BEGIN{ srand( 20200101 - today ) }
+	NR==int( 1105 * rand() + 1 )' bwv.txt)"
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
