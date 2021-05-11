@@ -7,17 +7,21 @@ player="mpv"
 ! hash "$player" 2>/dev/null && player="xdg-open"
 
 search="$(awk -c -v today="$(date "+%Y%m%d")" \
-	'BEGIN{ srand( 20200101 - today ) }
-	NR==int( 1105 * rand() + 1 )' bwv.txt)"
+		'BEGIN {
+				srand( 20200101 - today )
+				random = sprintf( int( 1105 * rand() + 1 ) )
+				}
+		NR == random' bwv.txt )"
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
 mapfile -t links < <(curl -s "$url" \
-	| awk -F"\"" '{for (i=1;i<=NF;i++) \
-			{if ($i ~ /watch\?/ && $i !~ /list/) \
-				{print $i ; count++ ; if (count==5) exit} \
-			} \
-		      }')
+	| awk 'BEGIN { FS = "\"" }
+		{ for (i=1; i<=NF; i++)
+				{ if ($i ~ /watch\?/ && $i !~ /list/)
+						{ print $i; count++; if (count==5) exit }
+				}
+		}')
 
 message() {
   cat << EOF
