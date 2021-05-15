@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=SC1004
+# shellcheck disable=SC1004,SC2162
 
 player="mpv"
 
