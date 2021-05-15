@@ -49,26 +49,28 @@ cl_prompt() {
 	COLUMNS=1
 
     select title in "${!title_url[@]}"; do
-    		$player "${title_url[$title]}"
+    		"$player" "${title_url[$title]}"
 			exit 0
     done
 	}
 
 dmenu_prompt() {
     title="$(dmenu -l 5 -p "Today's Bach is $search" <<< "$(cut -f1 - <<< "$titles_links")")"
-    $player "${title_url[$title]}"
+    "$player" "${title_url[$title]}"
+	exit 0
 	}
 
 fzf_prompt() {
 	title="$(fzf --prompt="Today's Bach is $search > " <<< "$(cut -f1 - <<< "$titles_links")")"
-    $player "${title_url[$title]}"
+    "$player" "${title_url[$title]}"
+	exit 0
 	}
 
 [ $# -eq 0 ] && cl_prompt
 
 while getopts "cdfhp:" opt ; do
 	case $opt in
-		p) player="$OPTARG" ; ${prompt:-cl_prompt} ;;
+		p) player="$OPTARG" ; "${prompt:-cl_prompt}" ;;
 		c) prompt=cl_prompt ;;
 		d) prompt=dmenu_prompt ;;
 		f) prompt=fzf_prompt ;;
