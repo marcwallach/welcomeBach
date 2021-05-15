@@ -6,7 +6,7 @@ player="mpv"
 
 ! hash "$player" 2>/dev/null && player="xdg-open"
 
-search="$(awk -c -v today="$(date "+%Y%m%d")" \
+search="$(awk -v today="$(date "+%Y%m%d")" \
 		'BEGIN {
 				srand( 20200101 - today )
 				random = sprintf( int( 1105 * rand() + 1 ) )
