@@ -15,13 +15,14 @@ search="$(awk -c -v today="$(date "+%Y%m%d")" \
 
 url="https://www.youtube.com/results?search_query=${search// /+}"
 
-mapfile -t links < <(curl -s "$url" \
-	| awk 'BEGIN { FS = "\"" }
-		{ for (i=1; i<=NF; i++)
-				{ if ($i ~ /watch\?/ && $i !~ /list/)
-						{ print $i; count++; if (count==5) exit }
-				}
-		}')
+titles_links="$(curl -s "$url" | ./filter.awk)"
+
+declare -A title_url
+
+while IFS=$'\t' read title url; do
+	title_url[$title]=$url
+done <<< "$titles_links"
+
 
 message() {
   cat << EOF
@@ -47,22 +48,20 @@ cl_prompt() {
 
 	COLUMNS=1
 
-	select link in "${links[@]}"; do
-		"$player" "https://www.youtube.com$link"
-	  break
-	done
+    select title in "${!title_url[@]}"; do
+    		$player "${title_url[$title]}"
+			exit 0
+    done
 	}
 
 dmenu_prompt() {
-	dmenu -l 5 -p "Today's Bach is $search" <<< "$(printf '%s\n' "${links[@]}")" \
-		| sed 's|^|https://www.youtube.com|' \
-		| xargs -r "$player"
+    title="$(dmenu -l 5 -p "Today's Bach is $search" <<< "$(cut -f1 - <<< "$titles_links")")"
+    $player "${title_url[$title]}"
 	}
 
 fzf_prompt() {
-	fzf --prompt="Today's Bach is $search > " <<< "$(printf '%s\n' "${links[@]}")" \
-		| sed 's|^|https://www.youtube.com|' \
-		| xargs -r "$player"
+	title="$(fzf --prompt="Today's Bach is $search > " <<< "$(cut -f1 - <<< "$titles_links")")"
+    $player "${title_url[$title]}"
 	}
 
 [ $# -eq 0 ] && cl_prompt
@@ -77,3 +76,5 @@ while getopts "cdfhp:" opt ; do
 		*) message ; exit 1 ;;
 	esac
 done
+
+$prompt
