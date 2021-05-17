@@ -6,26 +6,10 @@ player="mpv"
 
 ! hash "$player" 2>/dev/null && player="xdg-open"
 
-search="$(awk -v today="$(date "+%Y%m%d")" \
-		'BEGIN {
-				srand( 20200101 - today )
-				random = sprintf( int( 1105 * rand() + 1 ) )
-				}
-		NR == random' bwv.txt )"
-
-url="https://www.youtube.com/results?search_query=${search// /+}"
-
-titles_links="$(curl -s "$url" | ./filter.awk)"
-
 declare -A title_url
 
-while IFS=$'\t' read title url; do
-	title_url[$title]=$url
-done <<< "$titles_links"
-
-
 message() {
-  cat << EOF
+	cat << EOF
 SYNOPSIS
  	 welcomeBach [OPTIONS] [ARGUMENTS]
 
@@ -39,7 +23,25 @@ OPTIONS
   -d 	Use dmenu to select link.
   -f 	Use fzf to select link.
 EOF
-}
+	}
+
+fetch() {
+	[ -z $composer ] && composer=js_bach
+
+	search="$(awk -v today="$(date "+%Y%m%d")" \
+			-v lines="$(wc -l ./catalogues/$composer)" \
+			'BEGIN {
+					srand( 20200101 - today )
+					random = int( lines * rand() + 1 )
+				   }
+			NR == random' ./catalogues/$composer )"
+
+	url="https://www.youtube.com/results?search_query=${search// /+}+${composer}"
+
+	while IFS=$'\t' read title url; do
+		title_url[$title]=$url
+	done < <(curl -s "$url" | ./filter.awk)
+	}
 
 cl_prompt() {
 	printf '%s\n' "Today's Bach is:" "$search" ""
@@ -68,10 +70,11 @@ fzf_prompt() {
 
 [ $# -eq 0 ] && cl_prompt
 
-while getopts "cdfhp:" opt ; do
+while getopts "bc:dfhp:" opt ; do
 	case $opt in
 		p) player="$OPTARG" ; "${prompt:-cl_prompt}" ;;
-		c) prompt=cl_prompt ;;
+		c) composer="$OPTARG" ; "${prompt:-cl_prompt}" ;;
+		b) prompt=cl_prompt ;;
 		d) prompt=dmenu_prompt ;;
 		f) prompt=fzf_prompt ;;
 		h) message ; exit ;;
