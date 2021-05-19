@@ -26,7 +26,7 @@ EOF
 	}
 
 fetch() {
-	[ -z $composer ] && composer=js_bach
+	[ -z "$composer" ] && composer=js_bach
 
 	search="$(awk -v today="$(date "+%Y%m%d")" \
 			-v lines="$(wc -l ./catalogues/$composer)" \
@@ -62,7 +62,7 @@ dmenu_prompt() {
 	fetch &&
 
 	title="$(dmenu -l 5 -p "Today's Bach is $search" \
-	<<< $(printf '%s\n' "${!title_url[@]}"))"
+	<<< "$(printf '%s\n' "${!title_url[@]}")")"
 
 	"$player" "${title_url[$title]}"
 
@@ -73,7 +73,7 @@ fzf_prompt() {
 	fetch &&
 
 	title="$(fzf --prompt="Today's Bach is $search > " \
-	<<< $(printf '%s\n' "${!title_url[@]}"))"
+	<<< "$(printf '%s\n' "${!title_url[@]}")")"
 
 	"$player" "${title_url[$title]}"
 
