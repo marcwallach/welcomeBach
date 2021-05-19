@@ -19,7 +19,7 @@ DESCRIPTION
 OPTIONS
   -h	Print help and exit.
   -p	Set video-player command.
-  -c 	Use a CLI prompt to select link. (Default)
+  -c 	Set composer's catalogue to pick from
   -d 	Use dmenu to select link.
   -f 	Use fzf to select link.
 EOF
@@ -80,13 +80,10 @@ fzf_prompt() {
 	exit 0
 	}
 
-[ $# -eq 0 ] && cl_prompt
-
 while getopts "bc:dfhp:" opt ; do
 	case $opt in
-		p) player="$OPTARG" ; "${prompt:-cl_prompt}" ;;
-		c) composer="$OPTARG" ; "${prompt:-cl_prompt}" ;;
-		b) prompt=cl_prompt ;;
+		p) player="$OPTARG" ;;
+		c) composer="$OPTARG" ;;
 		d) prompt=dmenu_prompt ;;
 		f) prompt=fzf_prompt ;;
 		h) message ; exit ;;
@@ -94,4 +91,4 @@ while getopts "bc:dfhp:" opt ; do
 	esac
 done
 
-$prompt
+${prompt:-cl_prompt}
