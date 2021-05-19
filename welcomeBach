@@ -44,27 +44,39 @@ fetch() {
 	}
 
 cl_prompt() {
-	printf '%s\n' "Today's Bach is:" "$search" ""
+	fetch &&
+
+	printf '%s\n' "Today's ${composer##*_} is:" "$search" ""
 
 	PS3=$'\n'"Choose a link to a performance: "
 
 	COLUMNS=1
 
-    select title in "${!title_url[@]}"; do
-    		"$player" "${title_url[$title]}"
+	select title in "${!title_url[@]}"; do
+			"$player" "${title_url[$title]}"
 			exit 0
-    done
+	done
 	}
 
 dmenu_prompt() {
-    title="$(dmenu -l 5 -p "Today's Bach is $search" <<< "$(cut -f1 - <<< "$titles_links")")"
-    "$player" "${title_url[$title]}"
+	fetch &&
+
+	title="$(dmenu -l 5 -p "Today's Bach is $search" \
+	<<< $(printf '%s\n' "${!title_url[@]}"))"
+
+	"$player" "${title_url[$title]}"
+
 	exit 0
 	}
 
 fzf_prompt() {
-	title="$(fzf --prompt="Today's Bach is $search > " <<< "$(cut -f1 - <<< "$titles_links")")"
-    "$player" "${title_url[$title]}"
+	fetch &&
+
+	title="$(fzf --prompt="Today's Bach is $search > " \
+	<<< $(printf '%s\n' "${!title_url[@]}"))"
+
+	"$player" "${title_url[$title]}"
+
 	exit 0
 	}
 
