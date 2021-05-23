@@ -64,9 +64,12 @@ dmenu_prompt() {
 	title="$(dmenu -l 5 -p "Today's Bach is $search" \
 	<<< "$(printf '%s\n' "${!title_url[@]}")")"
 
-	"$player" "${title_url[$title]}"
-
-	exit 0
+	if  [ -n "$title" ]; then
+		"$player" "${title_url[$title]}"
+		exit 0
+	else
+		exit 1
+	fi
 	}
 
 fzf_prompt() {
@@ -75,9 +78,12 @@ fzf_prompt() {
 	title="$(fzf --prompt="Today's Bach is $search > " \
 	<<< "$(printf '%s\n' "${!title_url[@]}")")"
 
-	"$player" "${title_url[$title]}"
-
-	exit 0
+	if  [ -n "$title" ]; then
+		"$player" "${title_url[$title]}"
+		exit 0
+	else
+		exit 1
+	fi
 	}
 
 while getopts "bc:dfhp:" opt ; do
